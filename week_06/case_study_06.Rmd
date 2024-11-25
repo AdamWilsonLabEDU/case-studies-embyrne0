@@ -1,7 +1,66 @@
 ---
 title: "Case Study 06"
-author: Your Name
+author: Eleanor M. Byrne 
 date: August 1, 2020
 output: github_document
 ---
  
+ ### Packages/Libraries 
+```{r}
+library(terra)
+library(spData)
+library(tidyverse)
+library(sf)
+library(ncdf4)
+```
+ 
+ ### Data
+```{r}
+download.file("https://crudata.uea.ac.uk/cru/data/temperature/absolute.nc","crudata.nc", method="curl") # add the curl if there are issues
+
+# read in the data using the rast() function from the terra package
+tmean=rast("crudata.nc")
+
+# Inspect the tmean object
+print(tmean)
+plot(tmean)
+```
+### Calculate the Maximum Temperature Observed:
+```{r}
+# Step 2: Calculate the maximum value
+tmean_max <- max(tmean)
+
+# Plot the maximum temperature to visualize the new raster layer
+plot(tmean_max, main = "Maximum Temperature")
+
+# Step 3: Extract the maximum temperature observed in each country
+# Use terra::extract() to get the maximum temperature for each country
+max_temp_per_country <- terra::extract(tmean_max, world, fun = max, na.rm = TRUE, small = TRUE)
+
+# Bind the original world dataset with the new summary of the temperature data
+world_clim <- bind_cols(world, max_temp_per_country)
+
+# Rename the column for clarity
+colnames(world_clim)[ncol(world_clim)] <- "max_temp"
+```
+### Communicate your results 
+```{r}
+# Plot the maximum temperature in each country polygon
+ggplot(world_clim) +
+  geom_sf(aes(fill = max_temp), color = "black") +
+  scale_fill_viridis_c(name = "Maximum\nTemperature (C)") +
+  theme_minimal() +
+  theme(legend.position = 'bottom') +
+  ggtitle("Maximum Temperature in Each Country")
+
+# Find the hottest country in each continent
+hottest_continents <- world_clim %>%
+  group_by(continent) %>%
+  slice_max(order_by = max_temp, n = 1) %>%
+  select(name_long, continent, max_temp) %>%
+  arrange(desc(max_temp)) %>%
+  st_set_geometry(NULL)
+
+# Print the hottest country in each continent
+print(hottest_continents)
+```
