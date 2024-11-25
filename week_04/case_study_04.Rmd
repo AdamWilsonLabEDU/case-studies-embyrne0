@@ -1,22 +1,50 @@
 ---
 title: "Case Study 04"
-author: Your Name
+author: Eleanor M. Byrne 
 date: August 1, 2020
 output: github_document
 ---
 
-## First Header
+## Packages/Lib
 
 Comments
 
 ```{r}
-summary(cars)
+# This is for library/packages
+# install/load packages 
+library(tidyverse)
+# install.packages('nycflights13')
+library(nycflights13)
+library(dplyr)
 ```
 
-## Second Header
-
-Comments
+## Opening/Data/information
 
 ```{r}
-plot(pressure)
+# Open and access the nyc flights 
+airports <- nycflights13::airports
+flights <- nycflights13::flights
+```
+
+```{r}
+# Find the maximum distance and the corresponding destination airport code
+highest <- flights %>%
+  arrange(desc(distance)) %>%
+  slice(1) %>% 
+  select(dest, distance)
+# It would be HNL (dest)
+```
+
+```{r}
+# Join with airports data to get the full name of the airport
+farthest_airport_data <- highest %>%
+  left_join(airports, by = c("dest" = "faa")) %>%
+  select(name) # select the the destName column only 
+```
+
+```{r}
+# Convert the data.frame to a single character value with as.character()
+farthest_airport <- as.character(farthest_airport_data$name)
+# Print the farthest airport name
+farthest_airport
 ```
