@@ -1,7 +1,58 @@
 ---
 title: "Case Study 07"
-author: Your Name
+author: Eleanor M. Byrne 
 date: August 1, 2020
 output: github_document
 ---
+ ### Library/Packages
+```{r}
+# library and packages 
+library(tidyverse)
+library(reprex)
+library(sf)
+
+library(spData)
+data(world)
+```
+ ### Practice plot
+```{r}
+ggplot(world,aes(x=gdpPercap, y=continent, color=continent))+
+   geom_density(alpha=0.5,color=F)
+```
+ ### The Corrected Plot 
+```{r}
+# Corrected code to achieve the desired figure
+ggplot(world, aes(x = gdpPercap, fill = continent)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Distribution of GDP per Capita by Continent",
+       x = "GDP per Capita",
+       y = "Density") +
+  theme_minimal()
+```
+ ### Copy the Code to Your Clipboard
+```{r}
+reprex({
+  # Load necessary libraries
+  library(tidyverse)
+  library(sf)
+  library(spData)
+  
+  # Load the world data
+  data(world)
+  
+  # Your initial code with corrections
+  ggplot(world, aes(x = gdpPercap, fill = continent)) +
+    geom_density(alpha = 0.5) +
+    labs(title = "Distribution of GDP per Capita by Continent",
+         x = "GDP per Capita",
+         y = "Density") +
+    theme_minimal()
+}, venue = "gh")
+
+```
+ ### Post as an ‘issue’ in github 
+```{r}
+
+```
+ 
  
