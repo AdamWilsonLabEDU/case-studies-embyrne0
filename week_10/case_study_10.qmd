@@ -4,8 +4,9 @@ author: Eleanor M. Byrne
 format: html
 editor: visual
 ---
- 
-### PAckages/Library 
+
+### PAckages/Library
+
 ```{r}
 
 # Install required libraries
@@ -29,7 +30,8 @@ library(sf)
 library(ncdf4) # to import data from netcdf format
 ```
 
-### Land cover 
+### Land cover
+
 ```{r}
 # Create afolder to hold the downloaded data
 dir.create("data",showWarnings = F) #create a folder to hold the data
@@ -41,20 +43,26 @@ lst_url="https://github.com/adammwilson/DataScienceData/blob/master/inst/extdata
 download.file(lulc_url,destfile="data/MCD12Q1.051_aid0001.nc", mode="wb")
 download.file(lst_url,destfile="data/MOD11A2.006_aid0001.nc", mode="wb")
 ```
-### Load Data into R and plotting 
+
+### Load Data into R and plotting
+
 ```{r}
 lulc=rast("data/MCD12Q1.051_aid0001.nc",subds="Land_Cover_Type_1")
 lst=rast("data/MOD11A2.006_aid0001.nc",subds="LST_Day_1km")
 ```
+
 ```{r}
 plot(lulc)
 ```
+
 ```{r}
 # pick one year to work with 
 lulc=lulc[[13]]
 plot(lulc)
 ```
-### Land Cover Processing 
+
+### Land Cover Processing
+
 ```{r}
 Land_Cover_Type_1 = c(
     Water = 0, 
@@ -87,7 +95,9 @@ lcd=data.frame(
 # colors from https://lpdaac.usgs.gov/about/news_archive/modisterra_land_cover_types_yearly_l3_global_005deg_cmg_mod12c1
 kable(head(lcd))
 ```
+
 ### Convert LULC raster into a ‘factor’ (categorical) raster
+
 ```{r}
 # convert to raster (easy)
 lulc=as.factor(lulc)
@@ -109,15 +119,20 @@ gplot(lulc)+
   theme(legend.position = "right")+
   guides(fill=guide_legend(ncol=1,byrow=TRUE))
 ```
+
 ```{r}
 plot(lst[[1:12]])
 ```
+
 ### Convert LST to Degrees C
+
 ```{r}
 scoff(lst)=cbind(0.02,-273.15)
 plot(lst[[1:10]])
 ```
+
 ### Part 1: Extract timeseries for a point
+
 ```{r}
 # packages/library
 library(sf)
@@ -137,12 +152,12 @@ lw <- data.frame(x = -78.791547, y = 43.007211) %>%
 lw_rast <- st_transform(lw, crs = st_crs(lst))
 ```
 
-
 ```{r}
 # Extract the mean LST values within the buffer for each layer
 mean_lst_values <- terra::extract(lst, lw_rast, fun = mean, na.rm = TRUE)
 lst_values <- t(mean_lst_values)[-1, , drop = FALSE] # drop the first col
 ```
+
 ```{r}
 # Extract dates for each layer
 dates <- time(lst)
@@ -155,7 +170,8 @@ d_t <- cbind.data.frame(lst_values, dates)
 colnames(d_t) <-  c("mean_temp", "date") 
 ```
 
-# Plot the timeseries 
+# Plot the timeseries
+
 ```{r}
 # Plotting with ggplot
 ggplot(d_t, aes(x = date, y = mean_temp)) +
@@ -165,7 +181,9 @@ ggplot(d_t, aes(x = date, y = mean_temp)) +
   labs(x = 'Date', y = 'Monthly Mean Land Surface Temperature') +
   theme_minimal()
 ```
+
 ### Part 2: Summarize weekly data to monthly climatologies
+
 ```{r}
 #  summarize the mean value per month
 mean_month <- tapp(lst, index='month', fun=mean, na.rm = TRUE)
@@ -177,6 +195,7 @@ names(mean_month) = month.name[as.numeric(str_replace(names(mean_month),"m_","")
 ```
 
 ### Plot
+
 ```{r}
 # plot the map for each month
 gplot(mean_month) + geom_raster(aes(fill = value)) +
@@ -188,6 +207,7 @@ gplot(mean_month) + geom_raster(aes(fill = value)) +
           labs(x = 'x', y = 'y')
 
 ```
+
 ### Part 3: Summarize Land Surface Temperature by Land Cover
 
 ```{r}
@@ -218,7 +238,8 @@ lcds1_filtered <- lcds1_tidy %>%
   filter(landcover %in% c("Urban & built-up", "Deciduous Broadleaf forest"))
 ```
 
-### Plot the monthly variability 
+### Plot the monthly variability
+
 ```{r}
 ggplot(lcds1_filtered, aes(x = month, y = value, color = landcover)) +
   geom_jitter(alpha = 0.3, width = 0.2) +  # Add jitter to scatter points
@@ -229,4 +250,3 @@ ggplot(lcds1_filtered, aes(x = month, y = value, color = landcover)) +
   theme_minimal() +  # Use a minimal theme for the plot
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 ```
-
