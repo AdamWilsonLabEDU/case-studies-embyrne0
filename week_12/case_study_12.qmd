@@ -1,0 +1,79 @@
+---
+title: "Case Study 12"
+author: "Eleanor M. Byrne"
+format: html
+editor: visual
+---
+
+
+### packages
+```{r}
+# install
+  #install.packages("widgetframe")
+  # install.packages("dygraphs")
+  # install.packages("openmeteo")
+
+#load packages
+library(tidyverse)
+library(htmlwidgets)
+library(widgetframe)
+library(xts)
+library(dygraphs)
+library(openmeteo)
+```
+### download recent daily weather data for UB
+```{r}
+# downloading weather from UB region 
+d<- weather_history(c(43.00923265935055, -78.78494250958327),start = "2023-01-01",end=today(),
+                  daily=list("temperature_2m_max","temperature_2m_min","precipitation_sum")) %>% 
+  mutate(daily_temperature_2m_mean=(daily_temperature_2m_max+daily_temperature_2m_min)/2)
+```
+
+### The remaining steps 
+```{r}
+# Convert data to xts format, selecting only the temperature columns and the date
+d_xts <- xts(d[, c("daily_temperature_2m_max", "daily_temperature_2m_min", "daily_temperature_2m_mean")],
+             order.by = as.Date(d$date))
+# check the d variable to make sure the correct daily temperature is selected 
+
+```
+### Plotting the daily temperature in buffalo
+```{r}
+# Create the dygraph plot with title and series
+dygraph(d_xts, main = "Daily Maximum Temperature in Buffalo, NY") %>%
+  dySeries("daily_temperature_2m_max", label = "Max Temp") %>% # max
+  dySeries("daily_temperature_2m_min", label = "Min Temp") %>% # min
+  dySeries("daily_temperature_2m_mean", label = "Mean Temp") %>% # the mean
+  dyRangeSelector(dateWindow = c("2023-01-01", "2024-10-31")) # the timeframe chosen
+
+```
+### Explore other options: Precipitation
+```{r}
+# They only have precipitation in the dataframe, d
+  # add that to the current plot and to its own plot to compare 
+d_precip <- xts(d[, c("daily_precipitation_sum")],
+             order.by = as.Date(d$date)) # order the data 
+# check the d_precip variable to make sure the correct daily temperature is selected 
+
+# combine both d_precip and d_xt 
+d_xts <- cbind(d_xts, d_precip)
+```
+```{r}
+# add that to the plot and a seperate plot 
+  # Plot temperature data with precipitation included
+combo_plot <- dygraph(d_xts, main = "Daily Weather Data in Buffalo, NY") %>%
+  dySeries("daily_temperature_2m_max", label = "Max Temp") %>% # max temperature
+  dySeries("daily_temperature_2m_min", label = "Min Temp") %>% # min temperature
+  dySeries("daily_temperature_2m_mean", label = "Mean Temp") %>% # mean temperature
+  dySeries("daily_precipitation_sum", label = "Total Daily Precipitation", color = "blue") %>% # total daily precipitation
+  dyRangeSelector(dateWindow = c("2023-01-01", "2024-10-31"))
+combo_plot
+```
+```{r}
+# plot the precipitation by itself 
+precip_plot <- dygraph(d_precip, main = "Daily Precipitation in Buffalo, NY") %>%
+  dySeries("daily_precipitation_sum", label = "Total Daily Precipitation", color = "blue") %>%
+  dyRangeSelector(dateWindow = c("2023-01-01", "2024-10-31"))
+precip_plot
+```
+
