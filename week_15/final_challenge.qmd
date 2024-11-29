@@ -1,0 +1,52 @@
+---
+title: "Case Study 15 - Final"
+author: "Eleanor M. Byrne" 
+format: html
+editor: visual
+---
+```{r}
+# download the packages
+library(dplyr)
+library(ggplot2)
+```
+
+# download the data 
+```{r}
+# Import the data on atmospheric CO2 from the link below into R
+data_url="http://scrippsco2.ucsd.edu/assets/data/atmospheric/stations/in_situ_co2/monthly/monthly_in_situ_co2_mlo.csv"
+```
+
+```{r}
+# Remove the header of the file to retain only the data
+Co2_data <- read.csv(data_url, header = FALSE, skip = 72, stringsAsFactors = FALSE) # read the data and ignore headers
+# 95 was when the data started
+Co2_data <- Co2_data[!apply(Co2_data, 1, function(x) any(x == -99.99)), ] # filter out the -99.99
+```
+
+
+```{r}
+# Update the column names using the colnames vector below
+colnames=c("year","month","excel","decimal_year","co2","co2_seasonal","co2_fit","co2_seasonalfit","co2_filled","co2_seasonalfilled")
+colnames(Co2_data) <- colnames # this changes the col names to the colnames 
+```
+
+```{r}
+# Step 4: Remove the last column (NA) as it appears to be an extra unnamed column
+Co2_data <- Co2_data[, -ncol(Co2_data)]  # Remove the last column (NA), showed up so remove as mean CO2 can not be calculated 
+
+Co2_data$year <- as.numeric(Co2_data$year) # make sure the year is there 
+
+# Calculate the mean CO2 for each year
+mean_co2 <- Co2_data %>%
+  group_by(year) %>%
+  summarise(mean_co2 = mean(co2, na.rm = TRUE))
+```
+
+```{r}
+# plot a simple ggplot line graph of mean annual CO2 concentration each year as shown below
+ggplot(mean_co2, aes(x = year, y = mean_co2)) +
+  geom_line() +
+  labs(title = "Mean Annual CO2 Concentration", x = "Year", y = "Mean CO2 Concentration (ppm)") +
+  theme_minimal()
+```
+

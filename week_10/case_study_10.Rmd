@@ -5,3 +5,86 @@ date: August 1, 2020
 output: github_document
 ---
  
+### PAckages/Library 
+```{r}
+
+# Install required libraries
+  # install.packages("terra")
+  # install.packages("rasterVis")
+  #install.packages("ggmap")
+  #install.packages("tidyverse")
+  # install.packages("knitr")
+  #install.packages("sf")
+
+# Install ncdf4 for netCDF data handling
+install.packages("ncdf4")
+
+library(terra)
+library(rasterVis)
+library(ggmap)
+library(tidyverse)
+library(knitr)
+library(sf)
+# New Packages
+library(ncdf4) # to import data from netcdf format
+```
+
+### Land cover 
+```{r}
+# Create afolder to hold the downloaded data
+dir.create("data",showWarnings = F) #create a folder to hold the data
+
+lulc_url="https://github.com/adammwilson/DataScienceData/blob/master/inst/extdata/appeears/MCD12Q1.051_aid0001.nc?raw=true"
+lst_url="https://github.com/adammwilson/DataScienceData/blob/master/inst/extdata/appeears/MOD11A2.006_aid0001.nc?raw=true"
+
+# download them
+download.file(lulc_url,destfile="data/MCD12Q1.051_aid0001.nc", mode="wb")
+download.file(lst_url,destfile="data/MOD11A2.006_aid0001.nc", mode="wb")
+```
+### Load Data into R and plotting 
+```{r}
+lulc=rast("data/MCD12Q1.051_aid0001.nc",subds="Land_Cover_Type_1")
+lst=rast("data/MOD11A2.006_aid0001.nc",subds="LST_Day_1km")
+```
+```{r}
+plot(lulc)
+```
+```{r}
+# pick one year to work with 
+lulc=lulc[[13]]
+plot(lulc)
+```
+### Land Cover Processing 
+```{r}
+Land_Cover_Type_1 = c(
+    Water = 0, 
+    `Evergreen Needleleaf forest` = 1, 
+    `Evergreen Broadleaf forest` = 2,
+    `Deciduous Needleleaf forest` = 3, 
+    `Deciduous Broadleaf forest` = 4,
+    `Mixed forest` = 5, 
+    `Closed shrublands` = 6,
+    `Open shrublands` = 7,
+    `Woody savannas` = 8, 
+    Savannas = 9,
+    Grasslands = 10,
+    `Permanent wetlands` = 11, 
+    Croplands = 12,
+    `Urban & built-up` = 13,
+    `Cropland/Natural vegetation mosaic` = 14, 
+    `Snow & ice` = 15,
+    `Barren/Sparsely vegetated` = 16, 
+    Unclassified = 254,
+    NoDataFill = 255)
+
+lcd=data.frame(
+  ID=Land_Cover_Type_1,
+  landcover=names(Land_Cover_Type_1),
+  col=c("#000080","#008000","#00FF00", "#99CC00","#99FF99", "#339966", "#993366", "#FFCC99", 
+        "#CCFFCC", "#FFCC00", "#FF9900", "#006699", "#FFFF00", "#FF0000", "#999966", "#FFFFFF", 
+        "#808080", "#000000", "#000000"),
+  stringsAsFactors = F)
+# colors from https://lpdaac.usgs.gov/about/news_archive/modisterra_land_cover_types_yearly_l3_global_005deg_cmg_mod12c1
+kable(head(lcd))
+```
+
