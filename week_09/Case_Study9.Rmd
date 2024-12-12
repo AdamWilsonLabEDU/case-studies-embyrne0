@@ -1,7 +1,7 @@
 ---
-title: "Case_Study9"
+title: "Case Study 09"
+author: Eleanor M. Byrne 
 output: html_document
-date: "2024-10-29"
 ---
 
 ```{r setup, include=FALSE}
@@ -59,6 +59,7 @@ sf_stormdata <- storm_data %>%
 region <- st_bbox(sf_stormdata)
 print(region) # this is the bbox, the boundary/shapefile 
 ```
+
 ```{r}
 # This is for the ggplot 
   # use the world plot 
@@ -108,8 +109,6 @@ states_5 <- storm_counts %>%
 # Print the top 5 states
 print(states_5)
 ```
-
-
 
 ## Including Plots
 
