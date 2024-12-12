@@ -1,0 +1,60 @@
+---
+title: "Case Study 8 - Mauna Loa CO2 annual mean data"
+author: "Eleanor M. Byrne"
+format:
+  html: default
+  gfm: default
+  pptx: default
+  docx: default
+---
+
+### Download the packages
+```{r}
+# download packages
+  # install.packages("quarto")
+library(quarto)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+### Check out the data 
+```{r setup, include=FALSE, echo=FALSE, message=FALSE}
+# look at the data 
+url <- "ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_annmean_mlo.txt"
+co2_data <- read_table(url, skip = 45, # the data starts at row 45
+                       col_names = c("year", "mean", "unc"))
+```
+```{r}
+# view the data 
+head(co2_data)
+```
+### Plot a timeseries
+```{r}
+# Plot the time series
+ggplot(co2_data, aes(x = year, y = mean)) +
+  geom_line(color = "blue") +
+  labs(title = "Mauna Loa CO2 Annual Mean Levels",
+       x = "Year",
+       y = "CO2 (ppm)") +
+  theme_minimal()
+```
+### Create a table 
+```{r}
+# Create a nicely formatted table
+co2_table <- co2_data %>%
+  head(10) %>%
+  kable(format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+co2_table
+
+```
+```{r}
+# Render the document in all specified formats
+quarto::quarto_render("/Case_study08.qmd", output_format = "all")
+```
+
