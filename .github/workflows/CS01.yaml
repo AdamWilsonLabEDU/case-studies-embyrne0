@@ -25,7 +25,7 @@ jobs:
         shell: Rscript {0}
       - name: Case Study 01
         run: | 
-        testthat::test_file("tests/testthat/test-CS01.R",stop_on_failure = TRUE,reporter = "progress")
+          testthat::test_file("tests/testthat/test-CS01.R",stop_on_failure = TRUE,reporter = "progress")
         shell: Rscript {0}
       
       
