@@ -42,7 +42,7 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 
 
 
-```{r setup, include=FALSE, echo=FALSE, message=FALSE}
+```{r}
 # look at the data 
 url <- "ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_annmean_mlo.txt"
 co2_data <- read_table(url, skip = 45, # the data starts at row 45
@@ -66,7 +66,7 @@ head(co2_data)
 
 ```{r}
 # Plot the time series
-ggplot(co2_data, aes(x = year, y = mean)) +
+ggplot(co2_data, aes(x = year, y = mean)) + #use ggplot
   geom_line(color = "blue") +
   labs(title = "Mauna Loa CO2 Annual Mean Levels",
        x = "Year",
@@ -97,6 +97,6 @@ co2_table
 
 ```{r}
 # Render the document in all specified formats
-quarto::quarto_render("/Case_study08.qmd", output_format = "all")
+quarto::quarto_render("~/Case_study08.qmd", output_format = "all")
 ```
 
