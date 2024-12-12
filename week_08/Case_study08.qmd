@@ -35,7 +35,7 @@ head(co2_data)
 ### Plot a timeseries
 ```{r}
 # Plot the time series
-ggplot(co2_data, aes(x = year, y = mean)) +
+ggplot(co2_data, aes(x = year, y = mean)) + #use ggplot
   geom_line(color = "blue") +
   labs(title = "Mauna Loa CO2 Annual Mean Levels",
        x = "Year",
@@ -53,7 +53,7 @@ co2_table <- co2_data %>%
 co2_table
 
 ```
-```{r}
+```{r setup, include=FALSE, echo=FALSE, message=FALSE}
 # Render the document in all specified formats
 quarto::quarto_render("/Case_study08.qmd", output_format = "all")
 ```
